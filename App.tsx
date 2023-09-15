@@ -1,118 +1,122 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import React, {useState} from 'react';
+import {Text, View, StyleSheet, Button, TouchableOpacity} from 'react-native';
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+export default function App() {
+  const [display, setDisplay] = useState('');
+  const [result, setResult] = useState('');
+  const [arabic, setArabic] = useState(true);
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+  const switchType = () => {
+    setArabic(!arabic);
+  };
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+  const handleButtonPress = (text: string) => {
+    if (text === '=') {
+      try {
+        setResult(eval(display));
+      } catch (error) {
+        setResult('Error');
+      }
+    } else if (text === 'C') {
+      setDisplay('');
+      setResult('');
+    } else if (text === 'CE') {
+      setDisplay(display.slice(0, -1)); // Remove last character
+    } else {
+      setDisplay(display + text);
+    }
+  };
 
-function Section({children, title}: SectionProps): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+  const buttons = [
+    'C', // Clear all
+    'CE', // Clear last character
+    '7',
+    '8',
+    '9',
+    '/',
+    '4',
+    '5',
+    '6',
+    '*',
+    '1',
+    '2',
+    '3',
+    '-',
+    '0',
+    '.',
+    '=',
+    '+',
+  ];
+
   return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
+    <View style={styles.container}>
+      <Text style={styles.display}>{display}</Text>
+      <Text style={styles.result}>{result}</Text>
+      <View style={styles.buttons}>
+        <TouchableOpacity onPress={switchType} style={styles.buttonSwitch}>
+          <Text style={styles.buttonText}>{arabic ? 'arabic' : 'roman'}</Text>
+        </TouchableOpacity>
+        {buttons.map(button => (
+          <TouchableOpacity
+            key={button}
+            style={styles.button}
+            onPress={() => handleButtonPress(button)}>
+            <Text style={styles.buttonText}>{button}</Text>
+          </TouchableOpacity>
+        ))}
+        <Button
+          title={arabic ? '1' : 'I'}
+          onPress={() => handleButtonPress('I')}
+        />
+      </View>
     </View>
   );
 }
 
-function App(): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
-
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  container: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: '#f2f2f2',
   },
-  sectionTitle: {
+  display: {
+    fontSize: 30,
+    textAlign: 'right',
+    marginRight: 20,
+    marginBottom: 10,
+    color: '#000',
+  },
+  result: {
+    fontSize: 48,
+    textAlign: 'right',
+    marginRight: 20,
+    marginBottom: 10,
+    color: '#000',
+  },
+  buttons: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  button: {
+    width: '25%',
+    height: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#333',
+    borderWidth: 1,
+    borderColor: '#666',
+  },
+  buttonSwitch: {
+    width: '50%',
+    height: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#333',
+    borderWidth: 1,
+    borderColor: '#666',
+  },
+  buttonText: {
     fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
+    color: '#fff',
   },
 });
-
-export default App;
