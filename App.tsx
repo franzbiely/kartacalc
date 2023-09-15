@@ -1,19 +1,50 @@
-import React, {useState} from 'react';
-import {Text, View, StyleSheet, Button, TouchableOpacity} from 'react-native';
+import React, { useState } from 'react';
+import { Text, View, StyleSheet, Button, TouchableOpacity } from 'react-native';
+import { arabicButtons, romanButtons } from './constant';
+import { arabicToRoman, romanToArabic } from './utils';
+
 
 export default function App() {
   const [display, setDisplay] = useState('');
   const [result, setResult] = useState('');
   const [arabic, setArabic] = useState(true);
+  const [buttons, setButtons] = useState(arabicButtons)
 
   const switchType = () => {
     setArabic(!arabic);
+    if (!arabic) {
+      setButtons(arabicButtons);
+      setResult(eval(display));
+      setDisplay('')
+    }
+    else {
+      setButtons(romanButtons);
+      const val = evaluateRomanExpression(display)
+      setResult(val)
+      setDisplay('')
+    }
   };
+
+
+
+  const evaluateRomanExpression = (expression: any) => {
+    const romanRegex = /([IVXLCDM]+)(?![IVXLCDM])/gi;
+    const result = expression.replace(romanRegex, (match: any) => romanToArabic(match));
+    const answer = eval(result)
+    return arabicToRoman(answer)
+  }
 
   const handleButtonPress = (text: string) => {
     if (text === '=') {
       try {
-        setResult(eval(display));
+        if (arabic) {
+          setResult(eval(display));
+        }
+        else {
+          const val = evaluateRomanExpression(display)
+
+          setResult(val)
+        }
       } catch (error) {
         setResult('Error');
       }
@@ -26,27 +57,6 @@ export default function App() {
       setDisplay(display + text);
     }
   };
-
-  const buttons = [
-    'C', // Clear all
-    'CE', // Clear last character
-    '7',
-    '8',
-    '9',
-    '/',
-    '4',
-    '5',
-    '6',
-    '*',
-    '1',
-    '2',
-    '3',
-    '-',
-    '0',
-    '.',
-    '=',
-    '+',
-  ];
 
   return (
     <View style={styles.container}>
@@ -64,10 +74,6 @@ export default function App() {
             <Text style={styles.buttonText}>{button}</Text>
           </TouchableOpacity>
         ))}
-        <Button
-          title={arabic ? '1' : 'I'}
-          onPress={() => handleButtonPress('I')}
-        />
       </View>
     </View>
   );
